@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:time_tracker_flutter_course/common_widgets/custom_raised_button.dart';
+import 'package:time_tracker_flutter_course/services/auth.dart';
 
 class SignInPage extends StatelessWidget {
+  final AuthBase auth;
+
+  const SignInPage({
+    Key key,
+    @required this.auth,
+  }) : super(key: key);
+
+  Future<void> _signInAnonymously() async {
+    try {
+      final u = await auth.signInAnonymously();
+      print(u);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(),
+        title: Center(
+          child: Text("Time Tracker"),
+        ),
       ),
       body: _buidlContext(context),
       backgroundColor: Colors.grey[200],
@@ -62,6 +81,16 @@ class SignInPage extends StatelessWidget {
             onPrimary: Colors.teal[50],
             height: 50.0,
             onPressed: () {},
+          ),
+          SizedBox(
+            height: 16.0,
+          ),
+          CustomRaisedButton(
+            label: 'Sign Annomusly',
+            color: Colors.yellow[700],
+            onPrimary: Colors.black87,
+            height: 50.0,
+            onPressed: _signInAnonymously,
           ),
         ],
       ),
