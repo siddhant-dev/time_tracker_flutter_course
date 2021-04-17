@@ -8,3 +8,10 @@ class NonEmptyStringValidator implements StringValidator {
     return val.isNotEmpty;
   }
 }
+
+class EmailAndPasswordValidators {
+  final StringValidator emailValidator = NonEmptyStringValidator();
+  final StringValidator passwordValidator = NonEmptyStringValidator();
+  final String invalidEmailText = 'Please enter an email id';
+  final String invalidPasswordText = 'Please enter your password';
+}
