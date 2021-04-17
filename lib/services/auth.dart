@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthBase {
-  Stream<User> authStateChanges();
+  Stream<User> onAuthChanges();
   User get currentUser;
-
+  Future<User> googleSignIn();
   Future<User> signInAnonymously();
   Future<void> signOut();
 }
@@ -12,7 +13,7 @@ class Auth implements AuthBase {
   final _firebaseAuth = FirebaseAuth.instance;
 
   @override
-  Stream<User> authStateChanges() => _firebaseAuth.authStateChanges();
+  Stream<User> onAuthChanges() => _firebaseAuth.authStateChanges();
 
   @override
   User get currentUser => _firebaseAuth.currentUser;
@@ -25,7 +26,32 @@ class Auth implements AuthBase {
   }
 
   @override
+  Future<User> googleSignIn() async {
+    final googleSignIn = GoogleSignIn();
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser != null) {
+      final googleAuth = await googleUser.authentication;
+      if (googleAuth.idToken != null) {
+        final UserCredential userCredential =
+            await _firebaseAuth.signInWithCredential(
+          GoogleAuthProvider.credential(
+            idToken: googleAuth.idToken,
+            accessToken: googleAuth.accessToken,
+          ),
+        );
+      } else {
+        throw FirebaseAuthException(
+            code: 'MSSNG_TOKEN', message: 'Missing Google Token');
+      }
+    } else {
+      throw FirebaseAuthException(
+          code: 'ERR_ABRT_BY_USER', message: 'SignIn was aborted by user');
+    }
+  }
+
+  @override
   Future<void> signOut() async {
+    await GoogleSignIn().signOut();
     await _firebaseAuth.signOut();
   }
 }
