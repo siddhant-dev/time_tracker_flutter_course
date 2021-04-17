@@ -6,6 +6,8 @@ abstract class AuthBase {
   User get currentUser;
   Future<User> googleSignIn();
   Future<User> signInAnonymously();
+  Future<User> signInWithEmail(String email, String password);
+  Future<User> createUser(String email, String password);
   Future<void> signOut();
 }
 
@@ -39,6 +41,7 @@ class Auth implements AuthBase {
             accessToken: googleAuth.accessToken,
           ),
         );
+        return userCredential.user;
       } else {
         throw FirebaseAuthException(
             code: 'MSSNG_TOKEN', message: 'Missing Google Token');
@@ -47,6 +50,22 @@ class Auth implements AuthBase {
       throw FirebaseAuthException(
           code: 'ERR_ABRT_BY_USER', message: 'SignIn was aborted by user');
     }
+  }
+
+  @override
+  Future<User> signInWithEmail(String email, String password) async {
+    final UserCredential userCredential =
+        await _firebaseAuth.signInWithCredential(
+      EmailAuthProvider.credential(email: email, password: password),
+    );
+    return userCredential.user;
+  }
+
+  @override
+  Future<User> createUser(String email, String password) async {
+    final UserCredential userCredential = await _firebaseAuth
+        .createUserWithEmailAndPassword(email: email, password: password);
+    return userCredential.user;
   }
 
   @override
