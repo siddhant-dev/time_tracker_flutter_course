@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:time_tracker_flutter_course/common_widgets/show_alret_dialog.dart';
 import 'package:time_tracker_flutter_course/services/auth.dart';
 
 class HomePage extends StatelessWidget {
-  final AuthBase auth;
-
-  const HomePage({Key key, this.auth}) : super(key: key);
-
-  Future<void> _signOut() async {
+  Future<void> _signOut(BuildContext context) async {
+    final auth = Provider.of<AuthBase>(context, listen: false);
     try {
       await auth.signOut();
     } catch (e) {
@@ -24,7 +22,7 @@ class HomePage extends StatelessWidget {
       cancelActionText: 'Cancel',
     );
     if (didRequestSignOut) {
-      _signOut();
+      _signOut(context);
     }
   }
 
